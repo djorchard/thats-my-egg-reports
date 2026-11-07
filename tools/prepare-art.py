@@ -22,6 +22,7 @@ shutil.copyfile(generated, original)
 inputs = [
     (original, art / 'labraduck-detective.webp', (960, 640)),
     (project / 'assets/branding/thats-my-egg-logo-v5.png', art / 'game-logo.png', (510, 249)),
+    (project / 'assets/branding/promotion-v2/thats-my-egg-game-icon.png', art / 'game-icon.png', (64, 64)),
     (project / 'assets/ui/collection-biomes/backyard-v1.png', art / 'game-world.webp', (1440, 960)),
 ]
 records = []

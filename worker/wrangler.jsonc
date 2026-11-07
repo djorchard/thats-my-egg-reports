@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "steal-an-egg-reports",
+  "account_id": "84847e5704373fb35830333471b96bbd",
   "main": "index.mjs",
   "compatibility_date": "2026-11-07",
   "workers_dev": true,
@@ -11,7 +12,7 @@
   "d1_databases": [{
     "binding": "DB",
     "database_name": "steal-an-egg-reports",
-    "database_id": "REPLACE_WITH_CREATED_DATABASE_ID"
+    "database_id": "7f115607-24a6-40e5-a1ec-c6dc7c555b15"
   }],
   "ratelimits": [{
     "name": "REPORT_LIMITER",

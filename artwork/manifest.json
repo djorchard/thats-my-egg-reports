@@ -57,6 +57,17 @@
       "runtime": "public\\fonts\\BuilderSans-ExtraBold.otf",
       "sha256": "0837070a1713fc7647e74ec51b80ab9d4bce6af5448117c5711bc8a139f3adf0",
       "unchanged_bytes": true
+    },
+    {
+      "source": "assets/branding/promotion-v2/thats-my-egg-game-icon.png",
+      "runtime": "public/art/game-icon.png",
+      "dimensions": [
+        64,
+        64
+      ],
+      "sha256": "0e15705ac6d53916d0659004550c9b75804196e7c28fe63517644bb72274f1d2",
+      "source_sha256": "fca442b3b83b8dd5feb37fb9c27146736c5e40eb9285d9e3500f28bc4ba78b46",
+      "role": "Reused canonical game icon for browser favicon"
     }
   ]
 }
