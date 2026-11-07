@@ -5,20 +5,33 @@
   "main": "index.mjs",
   "compatibility_date": "2026-11-07",
   "workers_dev": true,
-  "triggers": { "crons": ["*/5 * * * *"] },
+  "triggers": {
+    "crons": [
+      "*/5 * * * *"
+    ]
+  },
   "vars": {
     "JIRA_WEBSITE_AUTO_ENABLED": "false",
     "ALLOWED_ORIGIN": "https://djorchard.github.io",
-    "TURNSTILE_HOSTNAME": "djorchard.github.io"
+    "TURNSTILE_HOSTNAME": "djorchard.github.io",
+    "ALLOWED_ORIGINS": "https://thatsmyegg.com,https://www.thatsmyegg.com",
+    "TURNSTILE_HOSTNAMES": "thatsmyegg.com,www.thatsmyegg.com"
   },
-  "d1_databases": [{
-    "binding": "DB",
-    "database_name": "steal-an-egg-reports",
-    "database_id": "7f115607-24a6-40e5-a1ec-c6dc7c555b15"
-  }],
-  "ratelimits": [{
-    "name": "REPORT_LIMITER",
-    "namespace_id": "1001",
-    "simple": { "limit": 5, "period": 60 }
-  }]
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "steal-an-egg-reports",
+      "database_id": "7f115607-24a6-40e5-a1ec-c6dc7c555b15"
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "REPORT_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    }
+  ]
 }

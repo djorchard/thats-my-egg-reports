@@ -5,6 +5,18 @@ export class HttpError extends Error {
   constructor(status, message) { super(message); this.status = status; }
 }
 function json(value, status = 200) { return new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json' } }); }
+function allowedOrigin(request, env) {
+  const origin = request.headers.get('Origin');
+  if (!origin) return null;
+  const configured = [env.ALLOWED_ORIGIN, ...String(env.ALLOWED_ORIGINS || '').split(',')]
+    .filter((value) => typeof value === 'string').map((value) => value.trim()).filter(Boolean);
+  return configured.includes(origin) ? origin : null;
+}
+function allowedTurnstileHostname(hostname, env) {
+  const configured = [env.TURNSTILE_HOSTNAME, ...String(env.TURNSTILE_HOSTNAMES || '').split(',')]
+    .filter((value) => typeof value === 'string').map((value) => value.trim()).filter(Boolean);
+  return typeof hostname === 'string' && configured.includes(hostname);
+}
 async function limitedBody(request) {
   if (Number(request.headers.get('Content-Length')) > MAX_BODY) throw new HttpError(413, 'Please choose a smaller screenshot.');
   const reader = request.body?.getReader();
@@ -25,7 +37,7 @@ async function admin(request, env) {
   if (!env.ADMIN_TOKEN || (await digest(new TextEncoder().encode(actual))) !== (await digest(new TextEncoder().encode(`Bearer ${env.ADMIN_TOKEN}`)))) throw new HttpError(401, 'Enter a valid developer access key.');
 }
 async function create(request, env, ctx) {
-  if (request.headers.get('Origin') !== env.ALLOWED_ORIGIN) throw new HttpError(403, 'This website cannot submit reports.');
+  if (!allowedOrigin(request, env)) throw new HttpError(403, 'This website cannot submit reports.');
   const local = env.LOCAL_DEVELOPMENT === 'true';
   if (!local && (!env.TURNSTILE_SECRET || !env.REPORT_LIMITER || !env.ADMIN_TOKEN)) throw new HttpError(503, 'Reports are not open yet. Please check back soon.');
   if (env.REPORT_LIMITER) {
@@ -51,7 +63,7 @@ async function create(request, env, ctx) {
       method: 'POST', body: new URLSearchParams({ secret: env.TURNSTILE_SECRET, response: token, remoteip: request.headers.get('CF-Connecting-IP') || '' }), signal: AbortSignal.timeout(10_000)
     });
     const result = await verify.json();
-    if (!result.success || result.hostname !== env.TURNSTILE_HOSTNAME || result.action !== 'report') throw new HttpError(400, 'Verification expired. Please verify again and resubmit.');
+    if (!result.success || !allowedTurnstileHostname(result.hostname, env) || result.action !== 'report') throw new HttpError(400, 'Verification expired. Please verify again and resubmit.');
   }
   await env.DB.prepare('INSERT INTO reports (id, created_at, description, image, image_type, content_hash) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO NOTHING')
     .bind(id, new Date().toISOString(), description, bytes, bytes ? 'image/jpeg' : null, contentHash).run();
@@ -74,7 +86,7 @@ async function create(request, env, ctx) {
 async function route(request, env, ctx) {
   const url = new URL(request.url);
   if (request.method === 'OPTIONS') {
-    if (request.headers.get('Origin') !== env.ALLOWED_ORIGIN) throw new HttpError(403, 'Origin not allowed.');
+    if (!allowedOrigin(request, env)) throw new HttpError(403, 'Origin not allowed.');
     return new Response(null, { status: 204 });
   }
   const jira = await jiraRoute(request, env, admin, ctx);
@@ -132,8 +144,9 @@ export default {
     }
     const headers = new Headers(response.headers);
     headers.set('Cache-Control', 'no-store'); headers.set('X-Content-Type-Options', 'nosniff'); headers.set('Vary', 'Origin');
-    if (request.headers.get('Origin') === env.ALLOWED_ORIGIN) {
-      headers.set('Access-Control-Allow-Origin', env.ALLOWED_ORIGIN);
+    const responseOrigin = allowedOrigin(request, env);
+    if (responseOrigin) {
+      headers.set('Access-Control-Allow-Origin', responseOrigin);
       headers.set('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
       headers.set('Access-Control-Allow-Headers', 'Authorization, Content-Type, If-Match');
     }

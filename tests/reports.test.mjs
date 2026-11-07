@@ -86,6 +86,32 @@ test('production fails closed without verification and rate limiter; rate reject
     const list = await (await worker.fetch(get('/reports'), env)).json(); assert.equal(list.reports.length, 0);
   } finally { db.close(); }
 });
+
+test('legacy and public website origins can submit, with exact CORS responses', async () => {
+  const { db, env } = setup();
+  env.ALLOWED_ORIGINS = ' https://thatsmyegg.com, https://www.thatsmyegg.com ';
+  try {
+    for (const allowed of [origin, 'https://thatsmyegg.com', 'https://www.thatsmyegg.com']) {
+      const preflight = await worker.fetch(new Request('https://reports.example/reports', { method: 'OPTIONS', headers: { Origin: allowed, 'Access-Control-Request-Method': 'POST' } }), env);
+      assert.equal(preflight.status, 204);
+      assert.equal(preflight.headers.get('Access-Control-Allow-Origin'), allowed);
+      const report = submission({ image: false });
+      report.request.headers.set('Origin', allowed);
+      const response = await worker.fetch(report.request, env);
+      assert.equal(response.status, 201);
+      assert.equal(response.headers.get('Access-Control-Allow-Origin'), allowed);
+    }
+    const list = await (await worker.fetch(get('/reports'), env)).json();
+    assert.equal(list.reports.length, 3);
+    for (const deniedOrigin of ['https://thatsmyegg.com.attacker.example', 'http://thatsmyegg.com', 'null']) {
+      const denied = await worker.fetch(new Request('https://reports.example/reports', { method: 'OPTIONS', headers: { Origin: deniedOrigin } }), env);
+      assert.equal(denied.status, 403);
+      assert.equal(denied.headers.get('Access-Control-Allow-Origin'), null);
+    }
+    const missingOrigin = await worker.fetch(new Request('https://reports.example/reports', { method: 'OPTIONS' }), env);
+    assert.equal(missingOrigin.status, 403);
+  } finally { db.close(); }
+});
 test('production checks Turnstile hostname, action and success before saving', async () => {
   const { db, env } = setup(); const originalFetch = globalThis.fetch;
   try {
@@ -102,4 +128,29 @@ test('database failure reports failure instead of pretending to save', async () 
   const { db, env } = setup(); db.close();
   const response = await worker.fetch(submission().request, env);
   assert.equal(response.status, 503); assert.ok((await response.json()).error.includes('couldn’t save'));
+});
+
+test('production accepts configured website hostnames and rejects lookalike verification hosts', async () => {
+  const { db, env } = setup();
+  const originalFetch = globalThis.fetch;
+  Object.assign(env, {
+    LOCAL_DEVELOPMENT: 'false', TURNSTILE_SECRET: 'test-secret',
+    TURNSTILE_HOSTNAME: 'djorchard.github.io', TURNSTILE_HOSTNAMES: ' thatsmyegg.com, www.thatsmyegg.com ',
+    ALLOWED_ORIGINS: 'https://thatsmyegg.com,https://www.thatsmyegg.com',
+    REPORT_LIMITER: { limit: async () => ({ success: true }) }
+  });
+  try {
+    for (const hostname of ['djorchard.github.io', 'thatsmyegg.com', 'www.thatsmyegg.com']) {
+      globalThis.fetch = async () => Response.json({ success: true, hostname, action: 'report' });
+      const report = submission({ token: 'test-token', image: false });
+      report.request.headers.set('Origin', `https://${hostname}`);
+      assert.equal((await worker.fetch(report.request, env)).status, 201);
+    }
+    for (const hostname of ['thatsmyegg.com.attacker.example', '', undefined]) {
+      globalThis.fetch = async () => Response.json({ success: true, hostname, action: 'report' });
+      assert.equal((await worker.fetch(submission({ token: 'test-token' }).request, env)).status, 400);
+    }
+    const list = await (await worker.fetch(get('/reports'), env)).json();
+    assert.equal(list.reports.length, 3);
+  } finally { globalThis.fetch = originalFetch; db.close(); }
 });
