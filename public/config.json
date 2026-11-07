@@ -1,4 +1,4 @@
 {
-  "apiBaseUrl": "",
+  "apiBaseUrl": "https://steal-an-egg-reports.djorchard-eggs.workers.dev",
   "turnstileSiteKey": "0x4AAAAAAF3I6eaGK1se1O9N"
 }
