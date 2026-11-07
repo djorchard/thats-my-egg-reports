@@ -25,6 +25,11 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     if (!['GET', 'HEAD'].includes(req.method)) { res.writeHead(405).end(); return; }
+    if (url.pathname === '/config.json') {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
+      res.end(JSON.stringify({ apiBaseUrl: '', turnstileSiteKey: '' }));
+      return;
+    }
     const path = resolve(root, '.' + decodeURIComponent(url.pathname === '/' ? '/index.html' : url.pathname));
     if (!path.startsWith(root.endsWith(sep) ? root : root + sep)) { res.writeHead(403).end(); return; }
     const content = await readFile(path);

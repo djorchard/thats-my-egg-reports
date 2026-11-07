@@ -105,7 +105,7 @@ canvas.addEventListener('pointermove', (event) => {
 for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) canvas.addEventListener(name, (event) => {
   if (pointer === event.pointerId) { pointer = null; previous = null; }
 });
-$('reset').addEventListener('click', () => { if (!sending) { restore(); changed(); message('Red marks removed. Your screenshot is unchanged.'); } });
+$('reset-marks').addEventListener('click', () => { if (!sending) { restore(); changed(); message('Red marks removed. Your screenshot is unchanged.'); } });
 $('replace').addEventListener('click', () => { if (!sending && !loading) input.click(); });
 $('remove').addEventListener('click', () => { if (!sending) { clearImage(); message('Image removed.'); } });
 description.addEventListener('input', () => { $('character-count').textContent = `${description.value.length.toLocaleString('en')} / 4,000`; changed(); });
@@ -158,7 +158,7 @@ form.addEventListener('submit', async (event) => {
   }
 });
 $('another').addEventListener('click', () => {
-  form.reset(); clearImage(); changed(); $('character-count').textContent = '0 / 4,000';
+  HTMLFormElement.prototype.reset.call(form); clearImage(); changed(); $('character-count').textContent = '0 / 4,000';
   $('success').hidden = true; form.hidden = false; zone.focus();
 });
 async function init() {
