@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "steal-an-egg-reports",
+  "main": "index.mjs",
+  "compatibility_date": "2026-11-07",
+  "workers_dev": true,
+  "vars": {
+    "ALLOWED_ORIGIN": "https://djorchard.github.io",
+    "TURNSTILE_HOSTNAME": "djorchard.github.io"
+  },
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "steal-an-egg-reports",
+    "database_id": "REPLACE_WITH_CREATED_DATABASE_ID"
+  }],
+  "ratelimits": [{
+    "name": "REPORT_LIMITER",
+    "namespace_id": "1001",
+    "simple": { "limit": 5, "period": 60 }
+  }]
+}

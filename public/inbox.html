@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Developer inbox | That's my Egg!</title><link rel="stylesheet" href="./styles.css"><script type="module" src="./inbox.js"></script></head>
+<body>
+  <div class="world-backdrop" aria-hidden="true"></div>
+  <header class="masthead"><a class="wordmark" href="./" aria-label="That's my Egg! report page"><img src="./art/game-logo.png" width="180" height="88" alt="That's my Egg!"></a><span class="support-label"><span class="live-dot" aria-hidden="true"></span> DEVELOPER INBOX</span></header>
+  <main><div class="intro inbox-intro"><p class="eyebrow">PLAYER REPORTS</p><h1>A better game<br>starts <span>here.</span></h1><p>Private reports and screenshots from your players.</p></div>
+    <form id="access-form"><label for="access-key">Developer access key</label><input id="access-key" class="access-input" type="password" required autocomplete="off"><button class="primary-button" type="submit">Open inbox</button></form>
+    <p id="inbox-status" class="status" role="status" aria-live="polite"></p>
+    <div id="inbox-controls" class="inbox-actions" hidden><button id="refresh" class="primary-button" type="button">Check for reports</button><button id="logout" class="text-button" type="button">Lock inbox</button></div>
+    <div id="reports"></div><button id="more" class="text-button" type="button" hidden>Load more reports</button>
+  </main>
+  <footer><span>Reports are visible only with your access key.</span><a href="./">Back to reporting</a></footer>
+</body></html>

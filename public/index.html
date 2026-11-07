@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0d0f14">
+  <meta name="description" content="Found something odd in Steal an egg? Send a screenshot and tell us what happened.">
+  <title>Report an issue | That's my Egg!</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <div class="world-backdrop" aria-hidden="true"></div>
+  <header class="masthead"><a class="wordmark" href="./" aria-label="That's my Egg! report page"><img src="./art/game-logo.png" width="180" height="88" alt="That's my Egg!"></a><span class="support-label"><span class="live-dot" aria-hidden="true"></span> PLAYER SUPPORT</span></header>
+  <main class="report-layout">
+    <aside class="intro"><p class="eyebrow">BIG ADVENTURES. LITTLE HICCUPS.</p><h1>Found a bug?<br><span>Let’s crack it.</span></h1><p>Even the best adventures have a few surprises.<br>Show us what went wrong and help us make it better.</p><div class="mascot-art"><img src="./art/labraduck-detective.webp" width="768" height="512" alt="Labraduck investigating a spotted golden egg with a magnifying glass"></div><div class="mascot-note"><span class="note-line" aria-hidden="true"></span><p>A little detective work.<br><strong>A better world for every creature.</strong></p></div></aside>
+    <div class="report-panel">
+    <div class="panel-heading"><h2>Report an issue</h2><span class="private-label"><span class="live-dot" aria-hidden="true"></span> PRIVATE REPORT</span></div>
+    <p id="environment" class="notice" hidden></p>
+    <form id="report-form">
+      <section aria-labelledby="image-heading">
+        <div class="section-heading"><h2 id="image-heading"><span class="step">01</span> Add a screenshot</h2><span class="optional">Optional</span></div>
+        <input id="image-input" class="visually-hidden" type="file" accept="image/png,image/jpeg,image/webp">
+        <div id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="Choose a screenshot, or hover here and paste an image" aria-describedby="upload-help">
+          <div id="upload-prompt"><span class="upload-symbol" aria-hidden="true">PNG · JPG · WEBP</span><strong>Drop a screenshot here</strong><span>or <span class="text-link">choose an image</span></span><span id="upload-help" class="upload-help">Hover here and press <kbd>Ctrl</kbd> + <kbd>V</kbd> to paste<br>Images up to 15 MB</span></div>
+          <canvas id="image-canvas" aria-label="Your screenshot. Draw with a finger, mouse or pen to mark the issue in red." hidden></canvas>
+        </div>
+        <div id="image-tools" class="image-tools" hidden><span class="draw-hint"><span class="red-dot"></span> Draw on the image to highlight the issue</span><div class="tool-buttons"><button id="reset" type="button" class="text-button">Reset marks</button><button id="replace" type="button" class="text-button">Change image</button><button id="remove" type="button" class="text-button">Remove</button></div></div>
+      </section>
+      <section class="description-section" aria-labelledby="description-heading">
+        <div class="section-heading"><h2 id="description-heading"><span class="step">02</span> What happened?</h2><span id="character-count" class="optional">0 / 4,000</span></div>
+        <label for="description" class="visually-hidden">Describe the bug or issue</label>
+        <textarea id="description" name="description" required maxlength="4000" rows="5" placeholder="Tell us what went wrong and what you were doing when it happened..."></textarea>
+        <p class="field-help">A few details help us track it down. Please leave out personal information.</p>
+      </section>
+      <div id="verification"></div>
+      <p id="status" class="status" role="status" aria-live="polite" tabindex="-1"></p>
+      <button id="submit" type="submit" class="primary-button">Submit report</button>
+      <p class="privacy-note">Your report is shared privately with the game’s developer.</p>
+    </form>
+    <section id="success" class="success-card" hidden aria-labelledby="success-title"><p class="eyebrow">REPORT RECEIVED</p><h2 id="success-title" tabindex="-1">Thanks for the heads-up.</h2><p>Your report has been saved. You’re helping make the game better.</p><p id="receipt" class="receipt"></p><button id="another" type="button" class="primary-button">Report another issue</button></section>
+    </div>
+  </main>
+  <footer><span>Made for the adventurers of <strong>That’s my Egg!</strong></span><span>Player support <span class="footer-dot">·</span> <a href="./inbox.html">Developer inbox</a></span></footer>
+</body>
+</html>

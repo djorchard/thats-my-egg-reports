@@ -1,0 +1,5 @@
+Builder font family copyright (c) 2024, Roblox Corporation.
+Font files supplied with Roblox Studio, copied without modification.
+Used solely in the branded website supporting That's my Egg!, a Roblox game.
+Official usage terms: https://create.roblox.com/docs/resources/builder-font-license
+Builder is a trademark of Roblox Corporation.

@@ -1,0 +1,11 @@
+{
+  "name": "steal-an-egg-reports",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node tools/dev-server.mjs",
+    "test": "node --test --test-isolation=none tests/*.test.mjs",
+    "retrieve": "node tools/retrieve-reports.mjs"
+  }
+}

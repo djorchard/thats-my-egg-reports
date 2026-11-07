@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-07",
+  "art_tool": "built-in image_gen",
+  "generated_original": "artwork\\labraduck-detective-original.png",
+  "prompt_file": "artwork/prompt.txt",
+  "theme_source": "src/ui_theme.luau",
+  "theme_source_sha256": "2e7eaab83679486773297661403451492c8a04ae1553c78d2625045d75fcab9f",
+  "design": "Canonical logo, dark window/card colours, blue primary gradient and semantic Builder Sans weights. New Labraduck detective artwork. No replacement game UI renderer or new icon.",
+  "assets": [
+    {
+      "source": "bug-report-site/artwork/labraduck-detective-original.png",
+      "source_sha256": "1b4fb117c04fcf4d6673012f94e0081f0c9db2344420fb7b75fd399b73294d43",
+      "runtime": "public\\art\\labraduck-detective.webp",
+      "dimensions": [
+        960,
+        640
+      ],
+      "bytes": 464338,
+      "sha256": "6cc73fb6dfc97e4662cde73260ed86712c6d71a4775c412f760fdca4298c530f"
+    },
+    {
+      "source": "assets/branding/thats-my-egg-logo-v5.png",
+      "source_sha256": "4966c84f581bde57138fb0ce5ff8a2b49409021690976d3ee737661db9fee071",
+      "runtime": "public\\art\\game-logo.png",
+      "dimensions": [
+        510,
+        248
+      ],
+      "bytes": 152280,
+      "sha256": "076b91f30f1790b379ecc54e2407152e262d684ccf512374017eb6e25fda385e"
+    },
+    {
+      "source": "assets/ui/collection-biomes/backyard-v1.png",
+      "source_sha256": "97c45dd5b75b3a44f867d20b144e81c1b1b571ea8957b0e7af0c5c54b46ebcd8",
+      "runtime": "public\\art\\game-world.webp",
+      "dimensions": [
+        1440,
+        960
+      ],
+      "bytes": 315990,
+      "sha256": "c7d6b647e08577bff763e0985960a3e9d690843b94a2d60eb06dba07b656d67b"
+    },
+    {
+      "source": "Roblox Studio font: BuilderSans-Medium.otf",
+      "runtime": "public\\fonts\\BuilderSans-Medium.otf",
+      "sha256": "9f2d5253ab8ecefddfdebaef4c578eb3d1a2985589615604982d84fcabf6221d",
+      "unchanged_bytes": true
+    },
+    {
+      "source": "Roblox Studio font: BuilderSans-Bold.otf",
+      "runtime": "public\\fonts\\BuilderSans-Bold.otf",
+      "sha256": "30a9f5a26fd341c2b4a8ee1418b3061445c7c6ce8b4b2565b04480c1b1328af4",
+      "unchanged_bytes": true
+    },
+    {
+      "source": "Roblox Studio font: BuilderSans-ExtraBold.otf",
+      "runtime": "public\\fonts\\BuilderSans-ExtraBold.otf",
+      "sha256": "0837070a1713fc7647e74ec51b80ab9d4bce6af5448117c5711bc8a139f3adf0",
+      "unchanged_bytes": true
+    }
+  ]
+}
