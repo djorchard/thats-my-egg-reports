@@ -5,7 +5,9 @@
   "main": "index.mjs",
   "compatibility_date": "2026-11-07",
   "workers_dev": true,
+  "triggers": { "crons": ["*/5 * * * *"] },
   "vars": {
+    "JIRA_WEBSITE_AUTO_ENABLED": "false",
     "ALLOWED_ORIGIN": "https://djorchard.github.io",
     "TURNSTILE_HOSTNAME": "djorchard.github.io"
   },

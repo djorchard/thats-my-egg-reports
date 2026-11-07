@@ -4,15 +4,21 @@ import { readFileSync } from 'node:fs';
 export function database(path = ':memory:') {
   const db = new DatabaseSync(path);
   db.exec(readFileSync(new URL('../worker/schema.sql', import.meta.url), 'utf8'));
+  let batchQueue = Promise.resolve();
   return {
     close: () => db.close(),
-    async batch(statements) {
+    batch(statements) {
+      const runBatch = async () => {
       db.exec('BEGIN IMMEDIATE');
       try {
         const results = [];
         for (const statement of statements) results.push(await statement.run());
         db.exec('COMMIT'); return results;
       } catch (error) { db.exec('ROLLBACK'); throw error; }
+      };
+      const result = batchQueue.then(runBatch);
+      batchQueue = result.catch(() => {});
+      return result;
     },
     prepare(sql) {
       let parameters = [];

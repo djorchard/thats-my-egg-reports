@@ -1,3 +1,4 @@
+import { queueReport, dispatchReport, jiraRoute, flushJiraQueue } from './jira.mjs';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_BODY = 800_000;
 export class HttpError extends Error {
@@ -23,7 +24,7 @@ async function admin(request, env) {
   const actual = request.headers.get('Authorization') || '';
   if (!env.ADMIN_TOKEN || (await digest(new TextEncoder().encode(actual))) !== (await digest(new TextEncoder().encode(`Bearer ${env.ADMIN_TOKEN}`)))) throw new HttpError(401, 'Enter a valid developer access key.');
 }
-async function create(request, env) {
+async function create(request, env, ctx) {
   if (request.headers.get('Origin') !== env.ALLOWED_ORIGIN) throw new HttpError(403, 'This website cannot submit reports.');
   const local = env.LOCAL_DEVELOPMENT === 'true';
   if (!local && (!env.TURNSTILE_SECRET || !env.REPORT_LIMITER || !env.ADMIN_TOKEN)) throw new HttpError(503, 'Reports are not open yet. Please check back soon.');
@@ -56,15 +57,29 @@ async function create(request, env) {
     .bind(id, new Date().toISOString(), description, bytes, bytes ? 'image/jpeg' : null, contentHash).run();
   const saved = await env.DB.prepare('SELECT id, content_hash FROM reports WHERE id = ? UNION ALL SELECT id, content_hash FROM archived_receipts WHERE id = ? LIMIT 1').bind(id, id).first();
   if (!saved || saved.content_hash !== contentHash) throw new HttpError(409, 'This report changed. Edit your description and submit again.');
+  // Jira delivery happens after the durable report save and never changes the
+  // player's successful submission into an error when Jira is unavailable.
+  const deliver = async () => {
+    try {
+      const retained = await env.DB.prepare('SELECT created_at FROM reports WHERE id = ?').bind(saved.id).first();
+      if (retained && env.JIRA_WEBSITE_AUTO_ENABLED === 'true') {
+        const row = await queueReport(env, { source: 'website', id: saved.id, description, metadata: { reportedAt: retained.created_at, hasImage: Boolean(bytes) } });
+        await dispatchReport(env, row.report_key, new URL(request.url).origin);
+      }
+    } catch (error) { console.error('Jira report delivery pending:', error.name); }
+  };
+  if (ctx?.waitUntil) ctx.waitUntil(deliver()); else await deliver();
   return json({ id: saved.id }, 201);
 }
-async function route(request, env) {
+async function route(request, env, ctx) {
   const url = new URL(request.url);
   if (request.method === 'OPTIONS') {
     if (request.headers.get('Origin') !== env.ALLOWED_ORIGIN) throw new HttpError(403, 'Origin not allowed.');
     return new Response(null, { status: 204 });
   }
-  if (url.pathname === '/reports' && request.method === 'POST') return create(request, env);
+  const jira = await jiraRoute(request, env, admin, ctx);
+  if (jira) return jira;
+  if (url.pathname === '/reports' && request.method === 'POST') return create(request, env, ctx);
   await admin(request, env);
   if (url.pathname === '/reports' && request.method === 'GET') {
     const since = url.searchParams.get('since') || '0';
@@ -105,9 +120,12 @@ async function route(request, env) {
   throw new HttpError(404, 'Not found.');
 }
 export default {
-  async fetch(request, env) {
+  async scheduled(_event, env, ctx) {
+    ctx.waitUntil(flushJiraQueue(env, 'https://steal-an-egg-reports.djorchard-eggs.workers.dev'));
+  },
+  async fetch(request, env, ctx) {
     let response;
-    try { response = await route(request, env); }
+    try { response = await route(request, env, ctx); }
     catch (error) {
       if (!(error instanceof HttpError)) console.error('Report service failed:', error.name);
       response = json({ error: error instanceof HttpError ? error.message : 'We couldn’t save your report right now. Your image and message are still here. Please try again.' }, error instanceof HttpError ? error.status : 503);
